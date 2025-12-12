@@ -15,21 +15,21 @@ export default function FetchItems() {
 
     dispatch(fetchStatusActions.markFetchingStarted());
 
-    fetch("http://localhost:8080/items", { signal })
-      .then((res) => res.json())
-      .then(({ items }) => {
-        dispatch(itemsActions.addInitialItems(items));   // ✅ fixed typo
-        dispatch(fetchStatusActions.markFetchDone());
-        dispatch(fetchStatusActions.markFetchingFinished()); // ✅ loader stops
-      })
-      .catch((err) => {
-        if (err.name === "AbortError") {
-          console.log("Fetch aborted safely");
-        } else {
-          console.error("Fetch failed:", err);
-          dispatch(fetchStatusActions.markFetchingFinished()); // ✅ stop loader even on error
-        }
-      });
+    fetch("/items.json", { signal })   // ✅ localhost ki jagah public file
+  .then((res) => res.json())
+  .then(({ items }) => {
+    dispatch(itemsActions.addInitialItems(items));
+    dispatch(fetchStatusActions.markFetchDone());
+    dispatch(fetchStatusActions.markFetchingFinished());
+  })
+  .catch((err) => {
+    if (err.name === "AbortError") {
+      console.log("Fetch aborted safely");
+    } else {
+      console.error("Fetch failed:", err);
+      dispatch(fetchStatusActions.markFetchingFinished());
+    }
+  });
 
     return () => {
       controller.abort(); // cleanup
